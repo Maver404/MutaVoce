@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  // Relative asset URLs: the same build works at a domain root and under a subpath
+  // such as https://<user>.github.io/<repo>/.
+  base: './',
   plugins: [
     react(),
     VitePWA({
@@ -16,6 +19,7 @@ export default defineConfig({
         theme_color: '#0d0f14',
         background_color: '#0d0f14',
         display: 'standalone',
+        lang: 'it',
         start_url: '.',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
