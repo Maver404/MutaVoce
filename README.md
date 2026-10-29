@@ -4,6 +4,8 @@ Voice changer in tempo reale che gira interamente nel browser: prendi la voce da
 
 Nessun server: l'audio non lascia mai il computer.
 
+**Provala online:** https://maver404.github.io/MutaVoce/
+
 ## Funzionalità
 
 - **42 preset** in tre categorie
@@ -45,7 +47,9 @@ npm test
 npm run build
 ```
 
-La build finisce in `dist/` ed è un sito statico: pubblicala su qualsiasi hosting **HTTPS** (Netlify, Vercel, GitHub Pages, Cloudflare Pages…). Il microfono funziona solo su HTTPS o su `localhost`.
+La build finisce in `dist/` ed è un sito statico con percorsi relativi: funziona su qualsiasi hosting **HTTPS**, anche in una sottocartella. Il microfono funziona solo su HTTPS o su `localhost`.
+
+Ogni push su `main` esegue i test, fa la build e pubblica il sito su GitHub Pages tramite `.github/workflows/deploy.yml` (in *Settings → Pages* la sorgente deve essere **GitHub Actions**).
 
 ## Usare la voce in un'altra applicazione
 
