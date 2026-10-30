@@ -1,0 +1,7 @@
+services:
+  mutavoce:
+    image: ghcr.io/maver404/mutavoce:latest
+    build: .
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

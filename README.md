@@ -51,6 +51,38 @@ La build finisce in `dist/` ed è un sito statico con percorsi relativi: funzion
 
 Ogni push su `main` esegue i test, fa la build e pubblica il sito su GitHub Pages tramite `.github/workflows/deploy.yml` (in *Settings → Pages* la sorgente deve essere **GitHub Actions**).
 
+## Docker
+
+L'immagine pronta è pubblicata su GitHub Container Registry per `linux/amd64` e `linux/arm64`. È un nginx senza privilegi che serve la build statica sulla porta 8080.
+
+```bash
+docker run -d --name mutavoce -p 8080:8080 --restart unless-stopped ghcr.io/maver404/mutavoce:latest
+```
+
+Poi apri http://localhost:8080. In alternativa, con il `compose.yaml` del repository:
+
+```bash
+docker compose up -d
+```
+
+Per costruire l'immagine in locale:
+
+```bash
+docker build -t mutavoce .
+```
+
+**HTTPS obbligatorio fuori da localhost.** I browser danno accesso al microfono solo su HTTPS (o su `localhost`). Se metti il container su un server, pubblicalo dietro un reverse proxy con certificato, per esempio Caddy, che lo ottiene da solo:
+
+```
+mutavoce.tuodominio.it {
+    reverse_proxy localhost:8080
+}
+```
+
+L'nginx del container imposta già header di sicurezza (Content-Security-Policy, `Permissions-Policy: microphone=(self)`), cache lunga per i file con hash e nessuna cache per `index.html` e il service worker, così gli aggiornamenti arrivano subito.
+
+Ogni push su `main` ricostruisce e pubblica `latest`. Un tag `vX.Y.Z` pubblica anche `X.Y.Z` e `X.Y`.
+
 ## Usare la voce in un'altra applicazione
 
 Un sito web non può creare un microfono virtuale, quindi serve un **cavo audio virtuale** gratuito. MutaVoce manda la voce all'ingresso del cavo, e l'altra app la riceve dall'uscita del cavo come se fosse un microfono. L'app contiene una guida passo passo (pulsante *Usa in altre app*) e riconosce il cavo da sola.
