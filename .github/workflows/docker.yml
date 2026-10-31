@@ -33,19 +33,45 @@ jobs:
 
       - name: Smoke test
         run: |
-          docker run -d --name mv -p 8080:8080 mutavoce:test
-          for i in $(seq 1 30); do curl -fsS http://localhost:8080/ >/dev/null && break; sleep 1; done
-          curl -fsS http://localhost:8080/ | grep -q '<div id="root">'
-          curl -fsSI http://localhost:8080/ | grep -qi '^permissions-policy: microphone=(self)'
-          curl -fsSI http://localhost:8080/ | grep -qi '^cache-control: no-cache'
-          curl -fsSI http://localhost:8080/manifest.webmanifest | grep -qi '^content-type: application/manifest+json'
-          asset=$(curl -fsS http://localhost:8080/ | grep -o 'assets/index-[^"]*\.js' | head -1)
-          curl -fsSI "http://localhost:8080/$asset" | grep -qi 'immutable'
-          worklet=$(curl -fsS "http://localhost:8080/$asset" | grep -o 'processors\.worklet-[A-Za-z0-9_-]*\.js' | head -1)
-          curl -fsS -o /dev/null "http://localhost:8080/assets/$worklet"
-          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/missing.js)" = 404
+          set -eux
+          fp() { echo | openssl s_client -connect "localhost:$1" -servername localhost 2>/dev/null | openssl x509 -noout -fingerprint -sha256; }
+          wait_up() { for i in $(seq 1 30); do curl -fsSk "$1" >/dev/null && return 0; sleep 1; done; docker logs mv; return 1; }
+
+          # HTTP + generated HTTPS certificate covering TLS_HOSTNAMES
+          docker run -d --name mv -p 8080:8080 -p 8443:8443 -e TLS_HOSTNAMES=mutavoce.test,192.0.2.10 mutavoce:test
+          wait_up http://localhost:8080/
+          wait_up https://localhost:8443/
+          for base in http://localhost:8080 https://localhost:8443; do
+            curl -fsSk "$base/" | grep -q '<div id="root">'
+            curl -fsSkI "$base/" | grep -qi '^permissions-policy: microphone=(self)'
+            curl -fsSkI "$base/" | grep -qi '^content-security-policy:'
+            curl -fsSkI "$base/" | grep -qi '^cache-control: no-cache'
+            curl -fsSkI "$base/manifest.webmanifest" | grep -qi '^content-type: application/manifest+json'
+            asset=$(curl -fsSk "$base/" | grep -o 'assets/index-[^"]*\.js' | head -1)
+            curl -fsSkI "$base/$asset" | grep -qi 'immutable'
+            worklet=$(curl -fsSk "$base/$asset" | grep -o 'processors\.worklet-[A-Za-z0-9_-]*\.js' | head -1)
+            curl -fsSk -o /dev/null "$base/assets/$worklet"
+            test "$(curl -sk -o /dev/null -w '%{http_code}' "$base/missing.js")" = 404
+          done
+          echo | openssl s_client -connect localhost:8443 2>/dev/null | openssl x509 -noout -ext subjectAltName | tee /dev/stderr | grep -q 'IP Address:192.0.2.10'
+          echo | openssl s_client -connect localhost:8443 2>/dev/null | openssl x509 -noout -ext subjectAltName | grep -q 'DNS:mutavoce.test'
           docker inspect --format '{{.Config.User}}' mutavoce:test | grep -qv '^root$\|^$'
+
+          # The certificate survives a restart (kept in the /certs volume)
+          before=$(fp 8443)
+          docker restart mv
+          wait_up https://localhost:8443/
+          test "$(fp 8443)" = "$before"
           docker logs mv
+
+          # A user-provided certificate is used as-is
+          mkdir -p usercerts
+          openssl req -x509 -newkey rsa:2048 -nodes -days 30 -subj /CN=provided -keyout usercerts/key.pem -out usercerts/cert.pem
+          chmod 644 usercerts/*.pem
+          docker run -d --name mv2 -p 9443:8443 -v "$PWD/usercerts:/certs:ro" mutavoce:test
+          wait_up https://localhost:9443/
+          test "$(fp 9443)" = "$(openssl x509 -in usercerts/cert.pem -noout -fingerprint -sha256)"
+          docker logs mv2
 
       - uses: docker/login-action@v3
         with:

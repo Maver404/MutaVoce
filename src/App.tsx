@@ -2,6 +2,7 @@ import { useT } from './i18n';
 import { type MobileTab, type RightTab, useApp } from './state/store';
 import { Icon, type IconName } from './ui/components/Icon';
 import { Header } from './ui/layout/Header';
+import { InsecureNotice } from './ui/panels/InsecureNotice';
 import { IOPanel } from './ui/layout/IOPanel';
 import { MasterBar } from './ui/layout/MasterBar';
 import { PresetBrowser } from './ui/layout/PresetBrowser';
@@ -68,7 +69,10 @@ export function App() {
   const mobileTab = useApp((s) => s.mobileTab);
   return (
     <div className="app">
-      <Header />
+      <div>
+        <Header />
+        <InsecureNotice />
+      </div>
       <main className="main" data-tab={mobileTab}>
         <aside className="col col-left">
           <PresetBrowser />

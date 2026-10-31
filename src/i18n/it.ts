@@ -11,7 +11,7 @@ export const it = {
   'status.idle': 'Spento',
   'status.running': 'Attivo',
 
-  'errors.insecure': 'Il microfono funziona solo su HTTPS o su localhost.',
+  'errors.insecure': 'Il browser blocca il microfono perché la pagina non è in HTTPS. Aprila in HTTPS oppure da localhost.',
   'errors.unsupported': "Questo browser non supporta l'audio in tempo reale necessario. Usa Chrome o Edge aggiornati.",
   'errors.permission': 'Permesso del microfono negato. Abilitalo dalle impostazioni del sito (icona del lucchetto) e riprova.',
   'errors.nodevice': 'Nessun microfono trovato, oppure il dispositivo è stato scollegato.',
@@ -341,6 +341,11 @@ export const it = {
 
   'theme.dark': 'Tema scuro',
   'theme.light': 'Tema chiaro',
+
+  'insecure.title': 'Microfono bloccato: la pagina è aperta in HTTP da {host}.',
+  'insecure.body': 'I browser concedono il microfono solo su HTTPS o su localhost.',
+  'insecure.open': 'Apri {url}',
+  'insecure.certWarning': '— se il browser avvisa che il certificato non è attendibile, è normale con quello generato dal container: scegli di procedere.',
 };
 
 export type TKey = keyof typeof it;

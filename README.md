@@ -53,13 +53,13 @@ Ogni push su `main` esegue i test, fa la build e pubblica il sito su GitHub Page
 
 ## Docker
 
-L'immagine pronta è pubblicata su GitHub Container Registry per `linux/amd64` e `linux/arm64`. È un nginx senza privilegi che serve la build statica sulla porta 8080.
+L'immagine pronta è pubblicata su GitHub Container Registry per `linux/amd64` e `linux/arm64`. È un nginx senza privilegi che serve la build statica in **HTTP sulla porta 8080** e in **HTTPS sulla porta 8443**.
 
 ```bash
-docker run -d --name mutavoce -p 8080:8080 --restart unless-stopped ghcr.io/maver404/mutavoce:latest
+docker run -d --name mutavoce -p 8080:8080 -p 8443:8443 -e TLS_HOSTNAMES=192.168.1.50 -v mutavoce-certs:/certs --restart unless-stopped ghcr.io/maver404/mutavoce:latest
 ```
 
-Poi apri http://localhost:8080. In alternativa, con il `compose.yaml` del repository:
+In alternativa, con il `compose.yaml` del repository (imposta `TLS_HOSTNAMES` nel file):
 
 ```bash
 docker compose up -d
@@ -71,7 +71,22 @@ Per costruire l'immagine in locale:
 docker build -t mutavoce .
 ```
 
-**HTTPS obbligatorio fuori da localhost.** I browser danno accesso al microfono solo su HTTPS (o su `localhost`). Se metti il container su un server, pubblicalo dietro un reverse proxy con certificato, per esempio Caddy, che lo ottiene da solo:
+### Quale indirizzo aprire
+
+I browser danno il microfono solo su **HTTPS** oppure su **localhost**. Aprendo `http://<indirizzo-del-server>:8080` la pagina si vede, ma il microfono resta bloccato (l'app lo segnala con un avviso e il link giusto).
+
+| Da dove apri | Indirizzo |
+| --- | --- |
+| Lo stesso computer dove gira Docker | http://localhost:8080 |
+| Un altro dispositivo in rete (NAS, server di casa…) | https://&lt;indirizzo-del-server&gt;:8443 |
+| Un dominio con un tuo reverse proxy | https://tuodominio |
+
+**Certificato.** Al primo avvio il container genera un certificato *autofirmato* valido per `localhost` e per i nomi/IP in `TLS_HOSTNAMES` (separati da virgola, es. `192.168.1.50,nas.local`). Il browser mostra un avviso "connessione non privata" la prima volta: scegli *Avanzate → Procedi*. Il certificato viene salvato nel volume `/certs`, così l'avviso non torna a ogni riavvio; se cambi `TLS_HOSTNAMES` viene rigenerato.
+
+Per evitare del tutto l'avviso hai due strade:
+
+- **Certificato tuo:** monta una cartella con `cert.pem` e `key.pem` su `/certs` (es. `-v /percorso/certificati:/certs:ro`): il container li usa così come sono.
+- **Reverse proxy con dominio:** per esempio Caddy, che ottiene da solo un certificato valido:
 
 ```
 mutavoce.tuodominio.it {
@@ -81,7 +96,7 @@ mutavoce.tuodominio.it {
 
 L'nginx del container imposta già header di sicurezza (Content-Security-Policy, `Permissions-Policy: microphone=(self)`), cache lunga per i file con hash e nessuna cache per `index.html` e il service worker, così gli aggiornamenti arrivano subito.
 
-Ogni push su `main` ricostruisce e pubblica `latest`. Un tag `vX.Y.Z` pubblica anche `X.Y.Z` e `X.Y`.
+Ogni push su `main` ricostruisce l'immagine, la prova (HTTP, HTTPS, certificato generato, certificato fornito, riavvio) e pubblica `latest`. Un tag `vX.Y.Z` pubblica anche `X.Y.Z` e `X.Y`.
 
 ## Usare la voce in un'altra applicazione
 

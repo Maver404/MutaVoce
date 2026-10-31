@@ -401,6 +401,34 @@ a {
   color: var(--text);
 }
 
+.insecure-notice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--warn) 45%, var(--line));
+  background: color-mix(in srgb, var(--warn) 12%, var(--panel));
+  font-size: 13px;
+  color: var(--text);
+}
+
+.insecure-notice svg {
+  color: var(--warn);
+  flex: none;
+  margin-top: 1px;
+}
+
+.insecure-notice div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+}
+
+.insecure-notice a {
+  font-weight: 700;
+  word-break: break-all;
+}
+
 /* ---------- Panels / sections ---------- */
 .panel-head {
   display: flex;

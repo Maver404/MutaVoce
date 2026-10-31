@@ -3,5 +3,14 @@ services:
     image: ghcr.io/maver404/mutavoce:latest
     build: .
     ports:
-      - "8080:8080"
+      - "8080:8080"   # HTTP: the microphone works only when opened as http://localhost
+      - "8443:8443"   # HTTPS: use https://<server-address>:8443 from other devices
+    environment:
+      # Server names/IPs to put in the self-signed certificate, comma-separated.
+      TLS_HOSTNAMES: ""
+    volumes:
+      - certs:/certs  # keeps the certificate across restarts; or mount your own cert.pem + key.pem
     restart: unless-stopped
+
+volumes:
+  certs:
