@@ -114,6 +114,33 @@ pactl load-module module-null-sink sink_name=MutaVoce sink_properties=device.des
 
 Lascia acceso *Ascolto* con le cuffie se vuoi sentirti mentre parli. La scheda può stare in secondo piano, ma non va chiusa.
 
+## Telefonate da iPhone o Android
+
+Con il solo telefono non si può: iOS e Android non permettono a nessuna app, né a una pagina web, di inserire audio in una chiamata telefonica. Lo stesso vale per le chiamate WhatsApp o Telegram fatte dal telefono. Si fa quindi passare la chiamata dal computer, dove MutaVoce manda la voce al cavo virtuale. Nell'app, la guida *Usa in altre app* ha una scheda **Telefonate** con gli stessi passi.
+
+**iPhone + Mac**
+
+1. Installa BlackHole 2ch e sceglilo in MutaVoce in *Invia ad altre app*.
+2. Sull'iPhone vai in *Impostazioni → (App →) Telefono → Chiamate su altri dispositivi* e attiva il Mac. Servono lo stesso Apple ID e la stessa Wi-Fi.
+3. Sul Mac vai in *FaceTime → Impostazioni* e attiva *Chiamate da iPhone*.
+4. In FaceTime, dal menu *Video*, scegli **BlackHole 2ch** come microfono (in alternativa: *Impostazioni di Sistema → Suono → Ingresso*). Poi chiama o rispondi dal Mac.
+
+**Android o iPhone + Windows**
+
+1. Installa VB-CABLE e scegli **CABLE Input** in *Invia ad altre app*.
+2. Apri *Collegamento al telefono* (Phone Link), associa il telefono e attiva le chiamate, che passano via Bluetooth.
+3. Vai in *Impostazioni → Sistema → Audio → Input* e scegli **CABLE Output** come predefinito.
+4. Chiama o rispondi da Collegamento al telefono.
+
+**Qualsiasi telefono, con un cavo.** Serve quando il computer non può gestire la chiamata, per esempio Android + Mac.
+
+- Collega l'uscita cuffie del computer (l'*Ascolto* di MutaVoce) all'ingresso microfono del telefono con uno sdoppiatore TRRS (microfono + cuffie).
+- Se il telefono non ha il jack, aggiungi un adattatore USB-C o Lightning che supporti il microfono.
+- Le tue cuffie vanno sul lato cuffie dello sdoppiatore.
+- Tieni basso il volume o usa un cavo attenuato: l'uscita cuffie è molto più forte di un microfono.
+
+In tutti i casi ascolta la chiamata in cuffia: con le casse la voce dell'altra persona rientra nel microfono e le torna indietro come eco.
+
 ## Compatibilità
 
 | | Chrome / Edge desktop | Firefox desktop | Safari | Mobile |

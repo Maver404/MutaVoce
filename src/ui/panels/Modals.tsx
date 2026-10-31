@@ -82,7 +82,7 @@ function GuideModal() {
   const sendId = useApp((s) => s.output.sendDeviceId);
   const sendOn = useApp((s) => s.output.sendEnabled);
   const detected = detectOS();
-  const [os, setOs] = useState<Exclude<OS, 'other'>>(detected === 'other' ? 'mac' : detected);
+  const [os, setOs] = useState<Exclude<OS, 'other'> | 'phone'>(detected === 'other' ? 'mac' : detected);
   const virtual = findVirtualOutput(outputs);
   const [copied, setCopied] = useState(false);
 
@@ -96,6 +96,7 @@ function GuideModal() {
           { value: 'mac', label: 'macOS' },
           { value: 'windows', label: 'Windows' },
           { value: 'linux', label: 'Linux' },
+          { value: 'phone', label: t('guide.tabPhone') },
         ]}
       />
       {os === 'mac' && (
@@ -148,6 +149,52 @@ function GuideModal() {
           <li>{t('guide.linux.2')}</li>
           <li>{t('guide.linux.3')}</li>
         </ol>
+      )}
+      {os === 'phone' && (
+        <>
+          <div className="callout warn" style={{ marginTop: 16 }}>
+            <Icon name="info" size={18} />
+            <span>{t('guide.phone.why')}</span>
+          </div>
+          <h4 className="guide-sub">{t('guide.phone.mac.title')}</h4>
+          <ol className="steps">
+            <li>
+              <span>
+                {t('guide.phone.mac.1')}{' '}
+                <a href="https://existential.audio/blackhole/" target="_blank" rel="noreferrer noopener">
+                  {t('guide.download')} BlackHole ↗
+                </a>
+              </span>
+            </li>
+            <li>{t('guide.phone.mac.2')}</li>
+            <li>{t('guide.phone.mac.3')}</li>
+            <li>{t('guide.phone.mac.4')}</li>
+          </ol>
+          <h4 className="guide-sub">{t('guide.phone.win.title')}</h4>
+          <ol className="steps">
+            <li>
+              <span>
+                {t('guide.phone.win.1')}{' '}
+                <a href="https://vb-audio.com/Cable/" target="_blank" rel="noreferrer noopener">
+                  {t('guide.download')} VB-CABLE ↗
+                </a>
+              </span>
+            </li>
+            <li>{t('guide.phone.win.2')}</li>
+            <li>{t('guide.phone.win.3')}</li>
+            <li>{t('guide.phone.win.4')}</li>
+          </ol>
+          <h4 className="guide-sub">{t('guide.phone.cable.title')}</h4>
+          <ol className="steps">
+            <li>{t('guide.phone.cable.1')}</li>
+            <li>{t('guide.phone.cable.2')}</li>
+            <li>{t('guide.phone.cable.3')}</li>
+          </ol>
+          <div className="callout" style={{ marginBottom: 8 }}>
+            <Icon name="headphones" size={18} />
+            <span>{t('guide.phone.echo')}</span>
+          </div>
+        </>
       )}
       <div className={`callout${virtual ? ' ok' : ''}`}>
         <Icon name={virtual ? 'check' : 'info'} size={18} />

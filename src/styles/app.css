@@ -1646,6 +1646,17 @@ a {
   font-size: 12px;
 }
 
+.guide-sub {
+  margin: 18px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.guide-sub + .steps {
+  margin-top: 8px;
+}
+
 .callout {
   display: flex;
   gap: 10px;
